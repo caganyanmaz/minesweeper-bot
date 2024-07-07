@@ -80,33 +80,27 @@ function clear_empty_fields(i, j)
   }
   console.log(get_adjacent_cell_positions(i, j));
   get_adjacent_cell_positions(i, j)
-    .filter(([ni, nj]) => parseInt(cells[ni][nj].dataset.state) === INITIAL_STATE)
+    .filter(([ni, nj]) => parseInt(cells[ni][nj].dataset.state) === INITIAL_STATE || parseInt(cells[ni][nj].dataset.state) === FLAG_STATE)
     .forEach(([ni, nj]) => clear_empty_fields(ni, nj));
 }
 
-
-function on_cell_right_click(i, j)
+function get_adjacent_flag_count(i, j)
 {
-  if (parseInt(cells[i][j].dataset.state) === INITIAL_STATE)
-  {
-    cells[i][j].dataset.state = FLAG_STATE;
-  }
-  else if (parseInt(cells[i][j].dataset.state) === FLAG_STATE)
-  {
-    cells[i][j].dataset.state = INITIAL_STATE;
-  }
+  return get_adjacent_cell_positions(i, j)
+    .filter(([ni, nj]) => parseInt(cells[ni][nj].dataset.state) === FLAG_STATE)
+    .reduce((acc, _) => acc + 1, 0);
 }
 
-function on_cell_click(i, j)
+
+function reveal_cell(i, j)
 {
-  console.log(MouseEvent.button);
-  if (game_over || current_player === COMPUTER || parseInt(cells[i][j].dataset.state) !== INITIAL_STATE)
+  if (game_over || parseInt(cells[i][j].dataset.state) !== INITIAL_STATE)
   {
     return;
   }
   if (has_mine(i, j))
   {
-    alert("You died :)");
+    alert("Game Over");
     game_over = true;
     return;
   }
@@ -122,11 +116,50 @@ function on_cell_click(i, j)
   }
 }
 
+
+function on_cell_right_click(i, j)
+{
+  const cell_state = parseInt(cells[i][j].dataset.state);
+  if (cell_state === INITIAL_STATE)
+  {
+    cells[i][j].dataset.state = FLAG_STATE;
+  }
+  else if (cell_state === FLAG_STATE)
+  {
+    cells[i][j].dataset.state = INITIAL_STATE;
+  }
+}
+
+
+function on_cell_click(i, j)
+{
+  console.log(MouseEvent.button);
+  if (current_player === COMPUTER)
+  {
+    return;
+  }
+  const cell_state = parseInt(cells[i][j].dataset.state);
+  if (cell_state === INITIAL_STATE)
+  {
+    reveal_cell(i, j);
+  }
+  else if (0 < cell_state && cell_state < 9 && cell_state === get_adjacent_flag_count(i, j))
+  {
+    get_adjacent_cell_positions(i, j)
+      .filter(([ni, nj]) => parseInt(cells[ni][nj].dataset.state) === INITIAL_STATE)
+      .forEach(([ni, nj]) => reveal_cell(ni, nj));
+  }
+}
+
 function create_cell(i, j)
 {
   const cell = document.createElement("div");
   cell.onclick = () => on_cell_click(i, j);
-  cell.oncontextmenu = () => on_cell_right_click(i, j);
+  cell.oncontextmenu = (event) => 
+  { 
+    event.preventDefault(); 
+    on_cell_right_click(i, j)
+  };
   cell.classList.add("cell");
   cell.dataset.state = INITIAL_STATE;
   cell.dataset.has_mine = false;
