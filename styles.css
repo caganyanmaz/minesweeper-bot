@@ -1,0 +1,60 @@
+.row {
+  display: flex;
+  flex-direction: row;
+}
+.cell {
+  box-sizing: border-box;
+  width:  30px;
+  height: 30px;
+  border: 1px solid black;
+  text-align: center;
+  background-color: beige;
+}
+
+.blackcell {
+  background-color: rgb(0, 0, 0);
+}
+
+[data-state="1"] {
+  color: blue;
+}
+
+[data-state="2"] {
+  color: green;
+}
+
+[data-state="3"] {
+  color: red;
+}
+
+[data-state="4"] {
+  color: purple;
+}
+
+[data-state="5"] {
+  color: yellow;
+}
+
+[data-state="6"] {
+  color: teal;
+}
+
+[data-state="7"] {
+  color: black;
+}
+
+[data-state="8"] {
+  color: lightgray;
+}
+
+[data-state="9"] {
+  background-color: gray;
+}
+
+[data-state="10"] {
+  background-color: black;
+}
+
+[data-state="11"] {
+  background-color: red;
+}
