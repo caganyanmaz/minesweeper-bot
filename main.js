@@ -34,19 +34,25 @@ function get_adjacent_mine_count(i, j)
     .reduce((acc, _) => acc + 1, 0);
 }
 
-function clear_empty_fields(i, j)
+function clear_empty_fields(si, sj)
 {
-  const mine_count = get_adjacent_mine_count(i, j);
-  cells[i][j].dataset.state = mine_count;
-  if (mine_count > 0)
+  const stack = [[si, sj]];
+  while (stack.length)
   {
-    cells[i][j].innerHTML = mine_count;
-    return;
+    const [i, j] = stack.pop();
+    const mine_count = get_adjacent_mine_count(i, j);
+    cells[i][j].dataset.state = mine_count;
+    if (mine_count > 0)
+    {
+      cells[i][j].innerHTML = mine_count;
+      continue;
+    }
+    get_adjacent_cell_positions(i, j)
+      .filter(([ni, nj]) => parseInt(cells[ni][nj].dataset.state) === INITIAL_STATE || parseInt(cells[ni][nj].dataset.state) === FLAG_STATE)
+      .forEach(([ni, nj]) => stack.push([ni, nj]));
+
   }
-  get_adjacent_cell_positions(i, j)
-    .filter(([ni, nj]) => parseInt(cells[ni][nj].dataset.state) === INITIAL_STATE || parseInt(cells[ni][nj].dataset.state) === FLAG_STATE)
-    .forEach(([ni, nj]) => clear_empty_fields(ni, nj));
-}
+ }
 
 
 function reveal_cell(i, j)

@@ -1,6 +1,6 @@
-const WIDTH  = 50;
-const HEIGHT = 30;
-const MINE_COUNT = 300;
+const WIDTH  = 200;
+const HEIGHT = 100;
+const MINE_COUNT = 2000;
 
 // 0 - 8: open state
 const INITIAL_STATE = 9;
