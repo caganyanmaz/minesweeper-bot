@@ -1,4 +1,4 @@
-const WIDTH  = 50; 
+const WIDTH  = 50;
 const HEIGHT = 30;
 const MINE_COUNT = 100;
 

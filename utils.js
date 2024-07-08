@@ -30,7 +30,7 @@ function get_sorted_unique(arr)
   const res = [arr[0]];
   for (let i = 1; i < arr.length; i++)
   { 
-    if (arr[i] !== arr[i-1])
+    if (arr[i][0] !== arr[i-1][0] || arr[i][1] !== arr[i-1][1])
     {
       res.push(arr[i]);
     }
@@ -56,7 +56,7 @@ function get_adjacent_states(i, j, state)
 
 function get_adjacent_state_count(i, j, state)
 {
-  get_adjacent_states(i, j, state)
+  return get_adjacent_states(i, j, state)
     .reduce((acc, _) => acc + 1, 0);
 }
 

@@ -8,6 +8,7 @@ let current_player = 0;
 let game_over = false;
 let game_lock = false;
 const PLAYER_NAMES = ["human", "computer"];
+const BOT_WAIT_TIME = 10;
 
 function has_mine(i, j)
 {
@@ -153,7 +154,6 @@ function bot_cycle()
   {
     return;
   }
-  while(game_lock);
   game_lock = true;
   states = cells.map(row => row.map(cell => parseInt(cell.dataset.state)));
   [action, i, j] = find_next_move(states);
@@ -170,12 +170,18 @@ function bot_cycle()
 
 function run_bot_loop()
 {
-  bot_cycle();
-  setTimeout(run_bot_loop, 1000);
+  if (game_over)
+    return;
+  if (!game_lock && current_player === COMPUTER)
+  {
+    bot_cycle();
+  }
+  setTimeout(run_bot_loop, BOT_WAIT_TIME);
 }
 
 function init()
 {
+  init_bot();
   create_cells();
   add_mines_to_cells();
   configure_switch_button();
