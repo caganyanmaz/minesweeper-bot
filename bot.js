@@ -124,6 +124,21 @@ function dfs(edges, edge_index, border_index)
 
 const guaranteed_moves = [];
 
+function try_find_simple_moves(arr, edges)
+{
+  const definite_mines = get_sorted_unique([].concat.apply([], 
+    edges.filter(([i, j]) => get_adjacent_state_count(i, j, INITIAL_STATE) + get_adjacent_state_count(i, j, FLAG_STATE) === arr[i][j])
+         .map(edge => get_adjacent_states(...edge, INITIAL_STATE))
+  ));
+  const definite_safes = get_sorted_unique([].concat.apply([],
+    edges.filter(([i, j]) => get_adjacent_state_count(i, j, FLAG_STATE) === arr[i][j])
+         .map(edge => get_adjacent_states(...edge, INITIAL_STATE))
+  ));
+  return definite_mines.map(border => [FLAG_ACTION, ...border]).concat(
+         definite_safes.map(border => [REVEAL_ACTION, ...border])
+  );
+}
+
 function find_next_move(arr)
 {
   if (guaranteed_moves.length > 1)
@@ -134,6 +149,11 @@ function find_next_move(arr)
   }
   states = arr;
   edges = find_edges(arr);
+  guaranteed_moves.push(...try_find_simple_moves(arr, edges));
+  if (guaranteed_moves.length > 1)
+  {
+    return find_next_move(arr);
+  }
   border = get_border(edges);
   if (border.length < 1)
   {
