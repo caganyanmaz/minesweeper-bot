@@ -122,22 +122,34 @@ function dfs(edges, edge_index, border_index)
   flags[ci][cj] = NOT_FLAGGED;
 }
 
+const guaranteed_moves = [];
+
 function find_next_move(arr)
 {
+  if (guaranteed_moves.length > 1)
+  {
+    const res = guaranteed_moves[guaranteed_moves.length-1];
+    guaranteed_moves.pop();
+    return res;
+  }
   states = arr;
   edges = find_edges(arr);
   border = get_border(edges);
   if (border.length < 1)
   {
-    return [REVEAL_ACTION, Math.floor(Math.random() * HEIGHT), Math.floor(Math.random() * WIDTH)];
+    return [REVEAL_ACTION, Math.floor(Math.random() * HEIGHT), Math.floor(Math.random() * WIDTH)]; // <- Buggy, because it might pick a flagged state
   }
   reset_all_cells();
   total_possibilities = 0;
   current_edge_predicted_mine_count = calculate_predicted_adjacent_mine_count(...edges[0]);
   dfs(edges, 0, 0);
   const definite_mines = border.filter(([i, j]) => possibilities[i][j] === 0);
-  if (definite_mines.length > 0)
-    return [FLAG_ACTION, ...definite_mines[0]];
+  const definite_safes = border.filter(([i, j]) => possibilities[i][j] === total_possibilities);
+  if ((definite_safes.length + definite_mines.length) > 0)
+  {
+    guaranteed_moves.push(...definite_mines.map(([i, j]) => [FLAG_ACTION, i, j]).concat(definite_safes.map(([i, j]) => [REVEAL_ACTION, i, j])));
+    return find_next_move(arr);
+  }
   const most_likely_empty = border.reduce(([mi, mj], [i, j]) => (possibilities[i][j] > possibilities[mi][mj]) ? [i, j] : [mi, mj]);
   return [REVEAL_ACTION, ...most_likely_empty];
 }
